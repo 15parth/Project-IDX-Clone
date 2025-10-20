@@ -18,7 +18,7 @@ const createProjectController = async(req, res) => {
         cwd:`./projects/${projectId}`
     })
 
-    res.json({ message: 'this worked' });
+    res.json({ message: 'project created', data : projectId });
 };
 
 
