@@ -1,15 +1,23 @@
 import express from 'express'
 import cors from 'cors'
+import {Server} from 'socket.io'
+import {createServer} from 'node:http'
 import { PORT } from './config/serverConfig.js'
 import apiRoutes from './routes/main.routes.js'
 
 
-
 const app = express()
+const server = createServer(app)
+const io= new Server(server);
+
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cors())
+
+io.on('connection', (sockets)=>{
+  console.log('server connrctred')
+})
 
 app.get('/ping',(req,res)=>{
     return res.json({message:'Pong'})
@@ -17,7 +25,7 @@ app.get('/ping',(req,res)=>{
 
 app.use('/api', apiRoutes)
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`server started on Port ${PORT}`);
 }).on("error", (err) => {
   console.error("Server failed to start:", err);
