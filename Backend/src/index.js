@@ -8,7 +8,13 @@ import apiRoutes from './routes/main.routes.js'
 
 const app = express()
 const server = createServer(app)
-const io= new Server(server);
+const io= new Server(server,{
+  cors:{
+     origin:'*',
+     method: ['GET','POST']
+  }
+});
+
 
 
 app.use(express.json())
@@ -16,7 +22,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(cors())
 
 io.on('connection', (sockets)=>{
-  console.log('server connrctred')
+  console.log('server connected')
 })
 
 app.get('/ping',(req,res)=>{
