@@ -42,6 +42,7 @@ export const handleEditorSocketEvents = (socket, editorNamespace) => {
 
 
     socket.on("readFile", async ({ pathToFileOrFolder }) => {
+        console.log(pathToFileOrFolder)
         try {
             const response = await fs.readFile(pathToFileOrFolder);
             console.log(response.toString());
