@@ -20,6 +20,7 @@
   "homepage": "https://github.com/15parth/Project-IDX-Clone#readme",
   "description": "",
   "dependencies": {
+    "chokidar": "^4.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "directory-tree": "^2.3.1",

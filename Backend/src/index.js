@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import {Server} from 'socket.io'
+import chokidar from 'chokidar';
 import {createServer} from 'node:http'
 import { PORT } from './config/serverConfig.js'
 import apiRoutes from './routes/main.routes.js'
@@ -16,20 +17,59 @@ const io= new Server(server,{
 });
 
 
-
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cors())
 
-io.on('connection', (sockets)=>{
-  console.log('server connected')
-})
+// io.on('connection', (sockets)=>{
+//   console.log('server connected')
+// })
 
 app.get('/ping',(req,res)=>{
     return res.json({message:'Pong'})
 })
 
 app.use('/api', apiRoutes)
+
+ 
+const editorNamespce = io.of('/editor');
+
+editorNamespce.on("connection",(socket)=>{
+
+  console.log('editor connected');
+
+  let projectId=socket.handshake.query['projectId'];
+  console.log('projectId receive after connection->', projectId)
+
+  if(projectId){
+    var watcher = chokidar.watch(`./projects/${projectId}`,{
+      ignored:(path)=> path.includes("node_modules"),
+      persistent:true, //keeps the watcher in running state 
+      awaitWriteFinish:{
+        stabilityThreshold:2000, // ensure stablity of files before triggering event
+        pollInterval:100,
+      },
+      ignoreInitial:true
+    }).on("all",(event,path)=>{
+        console.log(event, path)
+    })
+
+    
+  }
+
+
+  socket.on("message", (data)=>{
+    console.log('this is the data',data);
+    const message = JSON.parse(data.toString());
+  })
+
+  socket.on("disconnet",async()=>{
+    await watcher.close()
+    console.log('editor disconnected')
+  })
+    
+})
+
 
 server.listen(PORT, () => {
   console.log(`server started on Port ${PORT}`);
