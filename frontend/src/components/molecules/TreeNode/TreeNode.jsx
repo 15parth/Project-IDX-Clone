@@ -2,12 +2,15 @@ import React, { useState } from 'react'
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md"
 import FileIcon from '../../atoms/FileIcon/FileIcon';
+import { useEditorSocketStore } from '../../../store/editorSocketStore';
 
 const TreeNode = ({ fileFolderData }) => {
 
   const [visiblity, setVisiblity] = useState({
 
   });
+
+  const {editorSocket} = useEditorSocketStore();
 
   function toggleVisibility(name) {
     setVisiblity({
@@ -19,6 +22,14 @@ const TreeNode = ({ fileFolderData }) => {
   function computeExtension(fileFolderData) {
     const name = fileFolderData.name.split(".");
     return name[name.length - 1];
+  }
+
+  function handleDoubleClick(fileFolderData){
+    // console.log(fileFolderData)
+    console.log(editorSocket)
+    editorSocket.emit("readFile",{
+       pathToFileOrFolder: fileFolderData.path
+    })
   }
 
   return (
@@ -60,7 +71,9 @@ const TreeNode = ({ fileFolderData }) => {
                 cursor: "pointer",
                 marginLeft: "5px",
                 // color:"white",
-              }}>
+              }}
+              onDoubleClick={()=> handleDoubleClick(fileFolderData)}
+              >
                 {fileFolderData?.name}
               </p>
             </div>

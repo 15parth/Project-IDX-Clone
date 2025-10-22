@@ -5,6 +5,7 @@ import chokidar from 'chokidar';
 import {createServer} from 'node:http'
 import { PORT } from './config/serverConfig.js'
 import apiRoutes from './routes/main.routes.js'
+import { handleEditorSocketEvents } from './socketHandlers/editorHanlder.js';
 
 
 const app = express()
@@ -53,20 +54,20 @@ editorNamespce.on("connection",(socket)=>{
     }).on("all",(event,path)=>{
         console.log(event, path)
     })
-
-    
   }
 
 
-  socket.on("message", (data)=>{
-    console.log('this is the data',data);
-    const message = JSON.parse(data.toString());
-  })
+  // socket.on("message", (data)=>{
+  //   console.log('this is the data',data);
+  //   const message = JSON.parse(data.toString());
+  // })
 
-  socket.on("disconnet",async()=>{
-    await watcher.close()
-    console.log('editor disconnected')
-  })
+  handleEditorSocketEvents(socket, editorNamespce);
+
+  // socket.on("disconnet",async()=>{
+  //   await watcher.close()
+  //   console.log('editor disconnected')
+  // })
     
 })
 

@@ -16,11 +16,13 @@ const ProjectPlayground = () => {
 
     useEffect(()=>{
        setProjectId(projectIdFromUrl)
+       console.log('this is the url --> ',import.meta.env.VITE_BACKEND_URL)
        const editorSocketConn =io(`${import.meta.env.VITE_BACKEND_URL}/editor`,{
            query:{
              projectId:projectIdFromUrl
            }
        })
+       console.log('this is the editorSocketConn', editorSocketConn)
        setEditorSocket(editorSocketConn)
     },[projectIdFromUrl,setProjectId,setEditorSocket])
 
