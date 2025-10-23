@@ -55,19 +55,8 @@ editorNamespce.on("connection",(socket)=>{
         console.log(event, path)
     })
   }
-
-
-  // socket.on("message", (data)=>{
-  //   console.log('this is the data',data);
-  //   const message = JSON.parse(data.toString());
-  // })
-
   handleEditorSocketEvents(socket, editorNamespce);
 
-  // socket.on("disconnet",async()=>{
-  //   await watcher.close()
-  //   console.log('editor disconnected')
-  // })
     
 })
 

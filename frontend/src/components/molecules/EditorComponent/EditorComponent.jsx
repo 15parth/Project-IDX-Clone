@@ -1,36 +1,42 @@
-import React, { useEffect, useRef } from "react";
+import {useRef } from "react";
 import Editor from "@monaco-editor/react";
-import { useEditorSocketStore } from "../../../store/editorSocketStore";
 import { useActiveFileTabStore } from "../../../store/activeFileTabStore";
+import { useEditorSocketStore } from "../../../store/editorSocketStore";
+import { extensionToFileType } from "../../../utils/extensionToFileType";
 
 const EditorComponent = () => {
+
+  let timerId = null;
+
   const editorRef = useRef();
   const onMount = (editor) => {
     editorRef.current = editor;
     editor.focus();
   };
 
-  const { editorSocket } = useEditorSocketStore();
-  const { activeFileTab, setActiveFileTab } = useActiveFileTabStore();
-
-  useEffect(() => {
-    if (!editorSocket) return; // ✅ Wait until socket is set
-
-    const handleReadFile = (data) => {
-      console.log("✅ Read file success", data);
-      setActiveFileTab(data.path, data.value);
-    };
-
-    // ✅ Listen
-    editorSocket.on("readFileSuccess", handleReadFile);
-
-    // ✅ Cleanup when component unmounts or socket changes
-    return () => {
-      editorSocket.off("readFileSuccess", handleReadFile);
-    };
-  }, [editorSocket, setActiveFileTab]);
+  const { activeFileTab } = useActiveFileTabStore();
 
   console.log("value of active tab", activeFileTab);
+
+  const {editorSocket}= useEditorSocketStore()
+
+  function handleChange(value, e){
+   
+    if(timerId !== null) clearTimeout(timerId);
+
+   timerId = setTimeout(()=>{
+      const editorContent =value;
+      editorSocket?.emit("writeFile",{
+        data: editorContent,
+        pathToFileOrFolder: activeFileTab.path
+      })
+    },2000)
+
+
+    console.log(value, e)
+  }
+
+  console.log('this is the extention-->', activeFileTab?.extension)
 
   return (
     <Editor
@@ -41,12 +47,14 @@ const EditorComponent = () => {
       }}
       height="75vh"
       theme="vs-dark"
-      language={undefined}
+      definedLanguage={undefined}
+      language={extensionToFileType(activeFileTab?.extension)}
       value={
         activeFileTab?.value
           ? activeFileTab.value
           : "Welcome to the playground"
       }
+      onChange={handleChange}
       onMount={onMount}
     />
   );
