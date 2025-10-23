@@ -3,6 +3,7 @@ import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md"
 import FileIcon from '../../atoms/FileIcon/FileIcon';
 import { useEditorSocketStore } from '../../../store/editorSocketStore';
+import { useFileContextMenu } from '../../../store/fileContextMenuStore';
 
 const TreeNode = ({ fileFolderData }) => {
 
@@ -11,6 +12,13 @@ const TreeNode = ({ fileFolderData }) => {
   });
 
   const {editorSocket} = useEditorSocketStore();
+  
+  const {
+    setFile ,
+     setIsOpen:setFileContextMenuIsopen,
+     setX:setFileContextMenuX,
+     setY: setFileContextMenuY
+   }= useFileContextMenu()
 
   function toggleVisibility(name) {
     setVisiblity({
@@ -32,6 +40,14 @@ const TreeNode = ({ fileFolderData }) => {
     })
   }
 
+  function handleContextMenuForFile(e, path){
+    e.preventDefault();
+    setFile(path)
+    setFileContextMenuX(e.clientX);
+    setFileContextMenuY(e.clientY);
+    setFileContextMenuIsopen(true);
+  }
+
   return (
     (fileFolderData &&
       <div
@@ -50,8 +66,9 @@ const TreeNode = ({ fileFolderData }) => {
               outline: "none",
               color: "white",
               backgroundColor: "transparent",
-              paddingTop: "15px",
-              fontSize: "16px"
+              padding: "15px",
+              fontSize: "16px",
+              marginTop:"10px"
             }}
           >
             <MdOutlineKeyboardArrowRight style={{ height: "10px", width: "10px" }} />
@@ -62,17 +79,19 @@ const TreeNode = ({ fileFolderData }) => {
           (
             <div style={{
               display: "flex",
-              alignItems: "center"
+              alignItems: "center",
+              justifyContent:'start'
             }}>
               <FileIcon extension={computeExtension(fileFolderData)} />
               <p style={{
-                paddingTop: "5px",
+                padding: "15px",
                 fontSize: "15px",
                 cursor: "pointer",
                 marginLeft: "5px",
                 // color:"white",
               }}
               onDoubleClick={()=> handleDoubleClick(fileFolderData)}
+              onContextMenu={(e)=>handleContextMenuForFile(e,fileFolderData.path)}
               >
                 {fileFolderData?.name}
               </p>
