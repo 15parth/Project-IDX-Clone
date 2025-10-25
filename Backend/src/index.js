@@ -60,6 +60,12 @@ editorNamespce.on("connection",(socket)=>{
     
 })
 
+const terminamNamespace =io.of('/terminal');
+
+
+terminamNamespace.on("connection",()=>{
+    console.log()
+})
 
 server.listen(PORT, () => {
   console.log(`server started on Port ${PORT}`);
